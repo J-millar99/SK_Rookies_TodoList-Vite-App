@@ -1,15 +1,41 @@
-import React, { Component } from 'react';
-import TodoItem from './TodoItem';
+import { Component } from 'react';
+import PropTypes from 'prop-types';
+import './TodoItem.css';
 
-class TodoItemList extends Component {
+class TodoItem extends Component {
+    /*
+        true(checked 변수에 변동이 있으면) 이면 render() 함수가 호출됨
+        false(checked 변수에 변동이 없으면) 이면 render() 함수가 호출되지 않음 (렌더링 생략)
+    */    
+    shouldComponentUpdate(nextProps, nextState) {
+        return this.props.checked !== nextProps.checked;
+    }
+
     render() {
-        const { todos, myToggle, myRemove } = this.props;
+        const { text, checked, id, onToggle, onRemove } = this.props;
         return (
-            <div>
-                <TodoItem text="오늘의 할일1" checked={false} />
-                <TodoItem text="오늘의 할일2" checked={true} />
+            <div className="todo-item" onClick={() => onToggle(id)}>
+                <div className="remove" onClick={(e) => {
+                    e.stopPropagation(); // onToggle 이 실행되지 않도록 함
+                    onRemove(id)
+                }
+                }>&times;</div>
+                <div className={`todo-text ${checked && 'checked'}`}>
+                    <div>{text}</div>
+                </div>
+                {
+                    checked && (<div className="check-mark">✓</div>)
+                }
             </div>
         );
     }
 }
-export default TodoItemList;
+
+TodoItem.propTypes = {
+    text: PropTypes.string,
+    checked: PropTypes.bool,
+    id: PropTypes.number,
+    onToggle: PropTypes.func,
+    onRemove: PropTypes.func
+};
+export default TodoItem
